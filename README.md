@@ -43,7 +43,7 @@ describes a class - in our example a station wagon. The second part names a prop
 in our example its color. and the third part names a possible value for that property - in our example it
 is the color blue.
 
-### The layout of the main window
+### The layout and components of the main window
 
 The window is divided into 4 parts: to the left we have the GUI for adding/removing tags. This is split up into two 
 components where onyly one of them is possible at any one time. 
@@ -90,3 +90,5 @@ are defined to select the next/previous image to work on - those are ALT ENTER a
 At last, one more keystroke is defined to go up one folder - that key stroke is ALT CURSOR_UP. 
 
 This text field always has the focus. It is not necessary to click it to be able to type in it.  
+
+### The ontology
