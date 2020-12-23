@@ -4,3 +4,4 @@ DEADJOE
 *~
 *.iml
 /release.properties
+/pom.xml.releaseBackup
