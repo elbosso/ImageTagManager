@@ -5,11 +5,10 @@
 
 package de.elbosso.tools.tagmanager;
 
+import ch.qos.logback.classic.Level;
 import de.elbosso.ui.image.ImageDescription;
-import de.elbosso.ui.image.ImageViewer;
 import de.netsysit.ui.components.ImageGallery;
 import de.netsysit.util.ResourceLoader;
-import org.apache.log4j.Level;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,7 +27,7 @@ public class TagManager extends Object implements ImageGallery.EventCallback
 	,java.awt.event.WindowListener
 	, ImageGallery.ImageGalleryListener
 {
-	private final static org.apache.log4j.Logger CLASS_LOGGER = org.apache.log4j.Logger.getLogger(TagManager.class);
+	private final static org.slf4j.Logger CLASS_LOGGER = org.slf4j.LoggerFactory.getLogger(TagManager.class);
 	public static void main(String[] args)
 	{
 		try
@@ -168,17 +167,17 @@ public class TagManager extends Object implements ImageGallery.EventCallback
 	{
 		String keyStrokeAndKey = "alt ENTER";
 		KeyStroke keyStroke = KeyStroke.getKeyStroke(keyStrokeAndKey);//KeyEvent.VK_BACK_SPACE,0);
-		CLASS_LOGGER.debug(keyStroke);
+		CLASS_LOGGER.debug(java.util.Objects.toString(keyStroke));
 		tagManager.getTagTexField().getInputMap().put(keyStroke, keyStrokeAndKey);
 		tagManager.getTagTexField().getActionMap().put(keyStrokeAndKey, showNextImageAction);
 		keyStrokeAndKey = "alt shift ENTER";
 		keyStroke = KeyStroke.getKeyStroke(keyStrokeAndKey);//KeyEvent.VK_BACK_SPACE,0);
-		CLASS_LOGGER.debug(keyStroke);
+		CLASS_LOGGER.debug(java.util.Objects.toString(keyStroke));
 		tagManager.getTagTexField().getInputMap().put(keyStroke, keyStrokeAndKey);
 		tagManager.getTagTexField().getActionMap().put(keyStrokeAndKey, showPreviousImageAction);
 		keyStrokeAndKey = "alt UP";
 		keyStroke = KeyStroke.getKeyStroke(keyStrokeAndKey);//KeyEvent.VK_BACK_SPACE,0);
-		CLASS_LOGGER.debug(keyStroke);
+		CLASS_LOGGER.debug(java.util.Objects.toString(keyStroke));
 		tagManager.getTagTexField().getInputMap().put(keyStroke, keyStrokeAndKey);
 		tagManager.getTagTexField().getActionMap().put(keyStrokeAndKey, gotoParentFolderAction);
 	}
@@ -245,10 +244,10 @@ public class TagManager extends Object implements ImageGallery.EventCallback
 				}
 				catch(NullPointerException exp)
 				{
-					CLASS_LOGGER.warn(imageViewer);
-					CLASS_LOGGER.warn(imggal);
-					CLASS_LOGGER.warn(imggal.getImageDescription(currentSelection));
-					CLASS_LOGGER.warn(imggal.getImageDescription(currentSelection).getImgData());
+					CLASS_LOGGER.warn(java.util.Objects.toString(imageViewer));
+					CLASS_LOGGER.warn(java.util.Objects.toString(imggal));
+					CLASS_LOGGER.warn(java.util.Objects.toString(imggal.getImageDescription(currentSelection)));
+					CLASS_LOGGER.warn(java.util.Objects.toString(imggal.getImageDescription(currentSelection).getImgData()));
 				}
 			}
 			else
@@ -521,7 +520,7 @@ public class TagManager extends Object implements ImageGallery.EventCallback
 		}
 		else
 			selectedImageIndex=-1;
-		CLASS_LOGGER.debug(selectedImageIndex);
+		CLASS_LOGGER.debug(java.lang.Integer.toString(selectedImageIndex));
 		tagManager.getTagTexField().requestFocusInWindow();
 	}
 
