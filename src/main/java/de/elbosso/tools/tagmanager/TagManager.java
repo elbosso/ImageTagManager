@@ -5,10 +5,10 @@
 
 package de.elbosso.tools.tagmanager;
 
-import ch.qos.logback.classic.Level;
 import de.elbosso.ui.image.ImageDescription;
 import de.netsysit.ui.components.ImageGallery;
 import de.netsysit.util.ResourceLoader;
+import org.slf4j.event.Level;
 
 import javax.swing.*;
 import java.awt.*;
@@ -37,21 +37,22 @@ public class TagManager extends Object implements ImageGallery.EventCallback
 			iconFallbacks.load(is);
 			is.close();
 
-			iconFallbacks.put("de/elbosso/ressources/gfx/eb/function keys/f01_48.png","eb/svg/design/bitmap/function keys/f01_48.png");
-			iconFallbacks.put("de/elbosso/ressources/gfx/eb/function keys/f02_48.png","eb/svg/design/bitmap/function keys/f02_48.png");
-			iconFallbacks.put("de/elbosso/ressources/gfx/eb/function keys/f03_48.png","eb/svg/design/bitmap/function keys/f03_48.png");
-			iconFallbacks.put("de/elbosso/ressources/gfx/eb/function keys/f04_48.png","eb/svg/design/bitmap/function keys/f04_48.png");
-			iconFallbacks.put("de/elbosso/ressources/gfx/eb/function keys/f05_48.png","eb/svg/design/bitmap/function keys/f05_48.png");
-			iconFallbacks.put("de/elbosso/ressources/gfx/eb/function keys/f06_48.png","eb/svg/design/bitmap/function keys/f06_48.png");
-			iconFallbacks.put("de/elbosso/ressources/gfx/eb/function keys/f07_48.png","eb/svg/design/bitmap/function keys/f07_48.png");
-			iconFallbacks.put("de/elbosso/ressources/gfx/eb/function keys/f08_48.png","eb/svg/design/bitmap/function keys/f08_48.png");
-			iconFallbacks.put("de/elbosso/ressources/gfx/eb/function keys/f09_48.png","eb/svg/design/bitmap/function keys/f09_48.png");
-			iconFallbacks.put("de/elbosso/ressources/gfx/eb/function keys/f10_48.png","eb/svg/design/bitmap/function keys/f10_48.png");
-			iconFallbacks.put("de/elbosso/ressources/gfx/eb/function keys/f11_48.png","eb/svg/design/bitmap/function keys/f11_48.png");
-			iconFallbacks.put("de/elbosso/ressources/gfx/eb/function keys/f12_48.png","eb/svg/design/bitmap/function keys/f12_48.png");
+			iconFallbacks.put("de/elbosso/ressources/gfx/eb/function keys/f01_48.png","eb/svg/design/bitmap/function keys/f01_32.png");
+			iconFallbacks.put("de/elbosso/ressources/gfx/eb/function keys/f02_48.png","eb/svg/design/bitmap/function keys/f02_32.png");
+			iconFallbacks.put("de/elbosso/ressources/gfx/eb/function keys/f03_48.png","eb/svg/design/bitmap/function keys/f03_32.png");
+			iconFallbacks.put("de/elbosso/ressources/gfx/eb/function keys/f04_48.png","eb/svg/design/bitmap/function keys/f04_32.png");
+			iconFallbacks.put("de/elbosso/ressources/gfx/eb/function keys/f05_48.png","eb/svg/design/bitmap/function keys/f05_32.png");
+			iconFallbacks.put("de/elbosso/ressources/gfx/eb/function keys/f06_48.png","eb/svg/design/bitmap/function keys/f06_32.png");
+			iconFallbacks.put("de/elbosso/ressources/gfx/eb/function keys/f07_48.png","eb/svg/design/bitmap/function keys/f07_32.png");
+			iconFallbacks.put("de/elbosso/ressources/gfx/eb/function keys/f08_48.png","eb/svg/design/bitmap/function keys/f08_32.png");
+			iconFallbacks.put("de/elbosso/ressources/gfx/eb/function keys/f09_48.png","eb/svg/design/bitmap/function keys/f09_32.png");
+			iconFallbacks.put("de/elbosso/ressources/gfx/eb/function keys/f10_48.png","eb/svg/design/bitmap/function keys/f10_32.png");
+			iconFallbacks.put("de/elbosso/ressources/gfx/eb/function keys/f11_48.png","eb/svg/design/bitmap/function keys/f11_32.png");
+			iconFallbacks.put("de/elbosso/ressources/gfx/eb/function keys/f12_48.png","eb/svg/design/bitmap/function keys/f12_32.png");
 			iconFallbacks.put("de/netsysit/ressources/gfx/ca/öffnen_48.png","file/drawable-mdpi/ic_folder_open_black_48dp.png");
 			iconFallbacks.put("de/netsysit/ressources/gfx/common/ViewPortNavigator24.gif","gfx/compass_48.png");
 			de.netsysit.util.ResourceLoader.configure(iconFallbacks);
+			de.netsysit.util.ResourceLoader.setSize(ResourceLoader.IconSize.medium);
 		}
 		catch(java.io.IOException ioexp)
 		{
@@ -92,6 +93,7 @@ public class TagManager extends Object implements ImageGallery.EventCallback
 		registerCustomKeyStrokes();
 		scroller.setPreferredSize(new Dimension(420,400));
 		JTree tree=new JTree(tagManager.getTreeModel());
+		tree.setFont(tree.getFont().deriveFont(tree.getFont().getSize2D()/1.1f));
 		JScrollPane treescroller=new JScrollPane(tree);
 //		toplevel.add(scroller, BorderLayout.WEST);
 		toplevel.add(tagManager.getSelectedTagsPanel()/*selscroller*/, BorderLayout.NORTH);
