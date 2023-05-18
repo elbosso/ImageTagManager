@@ -9,6 +9,7 @@ import bsh.DelayedEvalBshMethod;
 import de.elbosso.ui.image.ImageDescription;
 import de.netsysit.ui.components.ImageGallery;
 import de.netsysit.util.ResourceLoader;
+import de.netsysit.util.pattern.command.FileProcessor;
 import org.slf4j.event.Level;
 
 import javax.swing.*;
@@ -76,6 +77,7 @@ public class TagManager extends Object implements ImageGallery.EventCallback
 	private Action gotoParentFolderAction;
 	private Action mergeSelectedTagsOntoAllImagesInFolderAction;
 	private javax.swing.Action clearTagsAction;
+	private de.netsysit.util.pattern.command.ChooseFileAction addOntologyAction;
 	private int selectedImageIndex=-1;
 	private final TagRepository tagRepository;
 	private ApplicationConfiguration applicationConfiguration=new ApplicationConfiguration();
@@ -103,7 +105,17 @@ public class TagManager extends Object implements ImageGallery.EventCallback
 		f.addWindowListener(this);
 		f.addWindowListener(this);
 		createActions();
-		java.util.List<String> l=new java.util.LinkedList(initCategories());
+		File root=null;
+		if(System.getProperty("de.elbosso.scratch.ui.ImageGallery.ontology")!=null)
+			root=new File(System.getProperty("de.elbosso.scratch.ui.ImageGallery.ontology"));
+		else
+		{
+			root = new java.io.File(de.elbosso.util.Utilities.getConfigDirectory(this.getClass().getName()),"ontology.conf");
+			CLASS_LOGGER.debug("XDG config directory: " + root);
+			if ((root == null)&&((root.exists())&&(root.isFile())))
+				root = new File(System.getProperty("user.home"));
+		}
+		java.util.List<String> l=new java.util.LinkedList(initCategories(root));
 		if((applicationConfiguration.getOntology()!=null)&&(applicationConfiguration.getOntology().isEmpty()==false))
 		{
 			l = new java.util.LinkedList();
@@ -119,6 +131,7 @@ public class TagManager extends Object implements ImageGallery.EventCallback
 		tb.setFloatable(false);
 		toplevel.add(tb, BorderLayout.NORTH);
 		tb.add(clearTagsAction);
+		tb.add(addOntologyAction);
 		scroller=new JScrollPane(tagManager.getAllTagsPanel());
 		scroller.setPreferredSize(new Dimension(420,400));
 		//scroller.setWheelScrollingEnabled(false);
@@ -132,7 +145,7 @@ public class TagManager extends Object implements ImageGallery.EventCallback
 //		toplevel.add(scroller, BorderLayout.WEST);
 		tagmanagement.add(tagManager.getSelectedTagsPanel()/*selscroller*/, BorderLayout.NORTH);
 		tagmanagement.add(treescroller, BorderLayout.EAST);
-		File root=applicationConfiguration.getCurrentDir();
+		root=applicationConfiguration.getCurrentDir();
 		tagRepository.setDirectory(root);
 		imggal=new ImageGallery(root,150,false);
 		imggal.setEventCallback(TagManager.this);
@@ -259,6 +272,31 @@ public class TagManager extends Object implements ImageGallery.EventCallback
 				tagmanagement.repaint();
 			}
 		};
+		de.netsysit.util.pattern.command.FileProcessor addOntology=new FileProcessor()
+		{
+			@Override
+			public boolean process(File[] files)
+			{
+				boolean rv=false;
+				java.util.Collection<java.lang.String> coll=new java.util.LinkedList();
+				for(java.io.File file:files)
+				{
+					coll.addAll(initCategories(file));
+				}
+				if(coll.isEmpty()==false)
+				{
+					for (java.lang.String tagName : coll)
+						tagManager.addTag(tagName);
+					tagmanagement.invalidate();
+					tagmanagement.validate();
+					tagmanagement.doLayout();
+					tagmanagement.repaint();
+				}
+				rv=true;
+				return rv;
+			}
+		};
+		addOntologyAction=new de.netsysit.util.pattern.command.ChooseFileAction(addOntology,"add");
 	}
 
 	private void showNextImage()
@@ -332,7 +370,7 @@ public class TagManager extends Object implements ImageGallery.EventCallback
 		showNextImageAction.setEnabled(imggal.getSelectedIndex()<imggal.getImageCount()-1);
 		tagManager.getTagTexField().requestFocusInWindow();
 	}
-	private java.util.Collection<String> initCategories()
+	private java.util.Collection<String> initCategories(java.io.File root)
 	{
 /*		categories.add("car|motorcycle|truck.color.black");
 		categories.add("car|motorcycle|truck.color.blue");
@@ -359,16 +397,6 @@ public class TagManager extends Object implements ImageGallery.EventCallback
 		java.util.List<String> refined=new java.util.LinkedList();
 		try
 		{
-			File root=null;
-			if(System.getProperty("de.elbosso.scratch.ui.ImageGallery.ontology")!=null)
-				root=new File(System.getProperty("de.elbosso.scratch.ui.ImageGallery.ontology"));
-			else
-			{
-				root = new java.io.File(de.elbosso.util.Utilities.getConfigDirectory(this.getClass().getName()),"ontology.conf");
-				CLASS_LOGGER.debug("XDG config directory: " + root);
-				if ((root == null)&&((root.exists())&&(root.isFile())))
-					root = new File(System.getProperty("user.home"));
-			}
 			java.io.InputStream is=new java.io.FileInputStream(root);
 
 			String[] categories=de.elbosso.util.Utilities.readIntoStringArray(is);
