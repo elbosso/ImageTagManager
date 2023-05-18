@@ -5,6 +5,7 @@
 
 package de.elbosso.tools.tagmanager;
 
+import bsh.DelayedEvalBshMethod;
 import de.elbosso.ui.image.ImageDescription;
 import de.netsysit.ui.components.ImageGallery;
 import de.netsysit.util.ResourceLoader;
@@ -14,8 +15,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
+import java.beans.DefaultPersistenceDelegate;
 import java.beans.PropertyChangeEvent;
+import java.beans.XMLEncoder;
 import java.io.File;
+import java.io.IOException;
 
 /**
  *
@@ -28,7 +32,8 @@ public class TagManager extends Object implements ImageGallery.EventCallback
 	, ImageGallery.ImageGalleryListener
 {
 	private final static org.slf4j.Logger CLASS_LOGGER = org.slf4j.LoggerFactory.getLogger(TagManager.class);
-	public static void main(String[] args)
+	private final java.io.File applicationConfigFile=new java.io.File(de.elbosso.util.Utilities.getConfigDirectory(TagManager.class.getName()),"applicationConfiguration.xml");
+	public static void main(String[] args) throws IOException
 	{
 		try
 		{
@@ -70,44 +75,64 @@ public class TagManager extends Object implements ImageGallery.EventCallback
 	private Action showPreviousImageAction;
 	private Action gotoParentFolderAction;
 	private Action mergeSelectedTagsOntoAllImagesInFolderAction;
+	private javax.swing.Action clearTagsAction;
 	private int selectedImageIndex=-1;
 	private final TagRepository tagRepository;
+	private ApplicationConfiguration applicationConfiguration=new ApplicationConfiguration();
+	private JPanel tagmanagement;
 
 	public TagManager()
 	{
 		super();
+		try
+		{
+			java.io.FileInputStream fis = new java.io.FileInputStream(applicationConfigFile);
+			java.beans.XMLDecoder dec = new java.beans.XMLDecoder(fis);
+			ApplicationConfiguration ac = (ApplicationConfiguration) dec.readObject();
+			dec.close();
+			fis.close();
+			applicationConfiguration = ac;
+		}
+		catch(java.lang.Throwable t)
+		{
+			CLASS_LOGGER.warn(t.getMessage(),t);
+		}
 		tagRepository=new PropertyTagRepositoryImpl();
 		JFrame f=new JFrame();
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		f.addWindowListener(this);
+		f.addWindowListener(this);
 		createActions();
 		java.util.List<String> l=new java.util.LinkedList(initCategories());
-		tagManager=new de.elbosso.ui.components.TagManager(l);
+		if((applicationConfiguration.getOntology()!=null)&&(applicationConfiguration.getOntology().isEmpty()==false))
+		{
+			l = new java.util.LinkedList();
+			for (de.elbosso.util.lang.TagDescription tagDescription : applicationConfiguration.getOntology())
+				l.add(tagDescription.getName());
+		}
+		tagManager=new de.elbosso.ui.components.TagManager(l,applicationConfiguration.getFavourites());
 		tagManager.addListener(this);
+		tagmanagement=new JPanel(new BorderLayout());
 		JPanel toplevel=new JPanel(new BorderLayout());
+		toplevel.add(tagmanagement);
+		javax.swing.JToolBar tb=new javax.swing.JToolBar();
+		tb.setFloatable(false);
+		toplevel.add(tb, BorderLayout.NORTH);
+		tb.add(clearTagsAction);
 		scroller=new JScrollPane(tagManager.getAllTagsPanel());
 		scroller.setPreferredSize(new Dimension(420,400));
 		//scroller.setWheelScrollingEnabled(false);
 		scroller.getVerticalScrollBar().setUnitIncrement(20);
-		toplevel.add(tagManager.getTagTexField(), BorderLayout.SOUTH);
+		tagmanagement.add(tagManager.getTagTexField(), BorderLayout.SOUTH);
 		registerCustomKeyStrokes();
 		scroller.setPreferredSize(new Dimension(420,400));
 		JTree tree=new JTree(tagManager.getTreeModel());
 		tree.setFont(tree.getFont().deriveFont(tree.getFont().getSize2D()/1.1f));
 		JScrollPane treescroller=new JScrollPane(tree);
 //		toplevel.add(scroller, BorderLayout.WEST);
-		toplevel.add(tagManager.getSelectedTagsPanel()/*selscroller*/, BorderLayout.NORTH);
-		toplevel.add(treescroller, BorderLayout.EAST);
-		File root=null;
-		if(System.getProperty("de.elbosso.scratch.ui.ImageGallery.folder")!=null)
-			root=new File(System.getProperty("de.elbosso.scratch.ui.ImageGallery.folder"));
-		else
-		{
-			root = de.elbosso.util.Utilities.getPicturesDirectory();
-			CLASS_LOGGER.debug("XDG pictures directory: " + root);
-			if ((root == null)&&((root.exists())&&(root.isDirectory())))
-				root = new File(System.getProperty("user.home"));
-		}
+		tagmanagement.add(tagManager.getSelectedTagsPanel()/*selscroller*/, BorderLayout.NORTH);
+		tagmanagement.add(treescroller, BorderLayout.EAST);
+		File root=applicationConfiguration.getCurrentDir();
 		tagRepository.setDirectory(root);
 		imggal=new ImageGallery(root,150,false);
 		imggal.setEventCallback(TagManager.this);
@@ -145,7 +170,7 @@ public class TagManager extends Object implements ImageGallery.EventCallback
 		renderer.setDefaultIcon(new ImageIcon(ResourceLoader.getImgResource("de/elbosso/ressources/gfx/common/Empty_48.png")));
 		tagManager.getFavsList().setCellRenderer(renderer);
 		dockingPanel.addDockable(favsScroller,"Favourites");
-		toplevel.add(dockingPanel);
+		tagmanagement.add(dockingPanel);
 		f.setContentPane(toplevel);
 		f.pack();
 		f.setVisible(true);
@@ -222,6 +247,18 @@ public class TagManager extends Object implements ImageGallery.EventCallback
 			}
 		};
 		mergeSelectedTagsOntoAllImagesInFolderAction.setEnabled(false);
+		clearTagsAction=new javax.swing.AbstractAction("clear")
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				tagManager.clearTags();
+				tagmanagement.invalidate();
+				tagmanagement.validate();
+				tagmanagement.doLayout();
+				tagmanagement.repaint();
+			}
+		};
 	}
 
 	private void showNextImage()
@@ -616,6 +653,24 @@ public class TagManager extends Object implements ImageGallery.EventCallback
 	{
 		CLASS_LOGGER.debug("windowClosing");
 		collectTags();
+		applicationConfiguration.setCurrentDir(tagRepository.getDirectory());
+		CLASS_LOGGER.error(tagRepository.getDirectory()+" "+applicationConfiguration.getCurrentDir());
+		applicationConfiguration.setOntology(new java.util.ArrayList(de.elbosso.model.Utilities.asList(de.elbosso.util.lang.TagDescription.class, tagManager.getListModel())));
+		applicationConfiguration.setFavourites(tagManager.getTagFavs());
+		try
+		{
+			java.io.FileOutputStream fos = new java.io.FileOutputStream(applicationConfigFile);
+			java.beans.XMLEncoder enc = new XMLEncoder(fos);
+			enc=de.elbosso.util.io.PersistenceDelegateRegistry.getSharedInstance().configureFor(java.io.File.class,enc);
+			enc.writeObject(applicationConfiguration);
+			enc.close();
+			fos.close();
+		}
+		catch(java.io.IOException exp)
+		{
+			CLASS_LOGGER.error(exp.getMessage(),exp);
+		}
+
 	}
 
 	@Override
