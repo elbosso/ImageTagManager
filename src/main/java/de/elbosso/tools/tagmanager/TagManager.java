@@ -78,6 +78,8 @@ public class TagManager extends Object implements ImageGallery.EventCallback
 	private Action mergeSelectedTagsOntoAllImagesInFolderAction;
 	private javax.swing.Action clearTagsAction;
 	private de.netsysit.util.pattern.command.ChooseFileAction addOntologyAction;
+	private de.netsysit.util.pattern.command.ChooseFileAction exportOntologyAction;
+	private javax.swing.Action gotoNextUntaggedAction;
 	private int selectedImageIndex=-1;
 	private final TagRepository tagRepository;
 	private ApplicationConfiguration applicationConfiguration=new ApplicationConfiguration();
@@ -132,6 +134,8 @@ public class TagManager extends Object implements ImageGallery.EventCallback
 		toplevel.add(tb, BorderLayout.NORTH);
 		tb.add(clearTagsAction);
 		tb.add(addOntologyAction);
+		tb.add(exportOntologyAction);
+		tb.add(gotoNextUntaggedAction);
 		scroller=new JScrollPane(tagManager.getAllTagsPanel());
 		scroller.setPreferredSize(new Dimension(420,400));
 		//scroller.setWheelScrollingEnabled(false);
@@ -297,6 +301,77 @@ public class TagManager extends Object implements ImageGallery.EventCallback
 			}
 		};
 		addOntologyAction=new de.netsysit.util.pattern.command.ChooseFileAction(addOntology,"add");
+		de.netsysit.util.pattern.command.FileProcessor exportOntology=new FileProcessor()
+		{
+			@Override
+			public boolean process(File[] files)
+			{
+				boolean rv=false;
+				try
+				{
+					java.io.FileOutputStream fos = new java.io.FileOutputStream(files[0]);
+					java.io.PrintWriter pw = new java.io.PrintWriter(fos);
+					javax.swing.ListModel<de.elbosso.util.lang.TagDescription> tagDescriptionListModel=tagManager.getListModel();
+					for(int i=0;i<tagDescriptionListModel.getSize();++i)
+						pw.println(tagDescriptionListModel.getElementAt(i).getName());
+					pw.close();
+					fos.close();
+					rv = true;
+				}
+				catch(java.io.IOException exp)
+				{
+					de.elbosso.util.Utilities.handleException(CLASS_LOGGER,exp);
+				}
+				return rv;
+			}
+		};
+		exportOntologyAction=new de.netsysit.util.pattern.command.ChooseFileAction(exportOntology,"export");
+		exportOntologyAction.setSaveDialog(true);
+		gotoNextUntaggedAction=new javax.swing.AbstractAction("gu")
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				int currentIndex=0;
+				int firstUntaggedIndex=-1;
+				collectTags();
+				try
+				{
+					while(true)
+					{
+						ImageDescription selectedImageDescription = imggal.getImageDescription(currentIndex);
+						if(selectedImageDescription.isFolder()==false)
+						{
+							if((selectedImageDescription.getTags()==null)||(selectedImageDescription.getTags().isEmpty()))
+								tagRepository.readTags(selectedImageDescription);
+							if(removeAutomaticTags(selectedImageDescription.getTags()).isEmpty()==true)
+							{
+								firstUntaggedIndex=currentIndex;
+								break;
+							}
+						}
+						++currentIndex;
+					}
+				}
+				catch(java.lang.Throwable t)
+				{
+
+				}
+				if(firstUntaggedIndex>-1)
+				{
+					imggal.setSelectedIndex(firstUntaggedIndex);
+					imageViewer.setImage(imggal.getImageDescription(firstUntaggedIndex).getImgData());
+					selectedImageIndex = firstUntaggedIndex;
+					if(selectedImageIndex>-1)
+						startTaggingWorkOnImage(imggal.getImageDescription(selectedImageIndex));
+					CLASS_LOGGER.debug(imggal.getSelectedIndex()+" "+imggal.getImageCount());
+					showPreviousImageAction.setEnabled(imggal.getSelectedIndex()>0);
+					showNextImageAction.setEnabled(imggal.getSelectedIndex()<imggal.getImageCount()-1);
+					tagManager.getTagTexField().requestFocusInWindow();
+				}
+
+			}
+		};
 	}
 
 	private void showNextImage()
