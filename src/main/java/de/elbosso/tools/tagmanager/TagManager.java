@@ -21,6 +21,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.XMLEncoder;
 import java.io.File;
 import java.io.IOException;
+import java.net.Inet4Address;
 
 /**
  *
@@ -264,7 +265,7 @@ public class TagManager extends Object implements ImageGallery.EventCallback
 			}
 		};
 		mergeSelectedTagsOntoAllImagesInFolderAction.setEnabled(false);
-		clearTagsAction=new javax.swing.AbstractAction("clear")
+		clearTagsAction=new javax.swing.AbstractAction(null,de.netsysit.util.ResourceLoader.getIcon("toolbarButtonGraphics/general/Remove24.gif"))
 		{
 			@Override
 			public void actionPerformed(ActionEvent e)
@@ -300,7 +301,7 @@ public class TagManager extends Object implements ImageGallery.EventCallback
 				return rv;
 			}
 		};
-		addOntologyAction=new de.netsysit.util.pattern.command.ChooseFileAction(addOntology,"add");
+		addOntologyAction=new de.netsysit.util.pattern.command.ChooseFileAction(addOntology,null,de.netsysit.util.ResourceLoader.getIcon("toolbarButtonGraphics/general/Add24.gif"));
 		de.netsysit.util.pattern.command.FileProcessor exportOntology=new FileProcessor()
 		{
 			@Override
@@ -325,9 +326,9 @@ public class TagManager extends Object implements ImageGallery.EventCallback
 				return rv;
 			}
 		};
-		exportOntologyAction=new de.netsysit.util.pattern.command.ChooseFileAction(exportOntology,"export");
+		exportOntologyAction=new de.netsysit.util.pattern.command.ChooseFileAction(exportOntology,null,de.netsysit.util.ResourceLoader.getIcon("toolbarButtonGraphics/general/Export24.gif"));
 		exportOntologyAction.setSaveDialog(true);
-		gotoNextUntaggedAction=new javax.swing.AbstractAction("gu")
+		gotoNextUntaggedAction=new javax.swing.AbstractAction(null,de.netsysit.util.ResourceLoader.getIcon("de/netsysit/ressources/gfx/common/HighlightSelection24.gif"))
 		{
 			@Override
 			public void actionPerformed(ActionEvent e)
