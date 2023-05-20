@@ -13,6 +13,7 @@ import de.netsysit.util.pattern.command.FileProcessor;
 import org.slf4j.event.Level;
 
 import javax.swing.*;
+import javax.swing.plaf.ButtonUI;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
@@ -130,13 +131,11 @@ public class TagManager extends Object implements ImageGallery.EventCallback
 		tagmanagement=new JPanel(new BorderLayout());
 		JPanel toplevel=new JPanel(new BorderLayout());
 		toplevel.add(tagmanagement);
-		javax.swing.JToolBar tb=new javax.swing.JToolBar();
-		tb.setFloatable(false);
-		toplevel.add(tb, BorderLayout.NORTH);
-		tb.add(clearTagsAction);
-		tb.add(addOntologyAction);
-		tb.add(exportOntologyAction);
-		tb.add(gotoNextUntaggedAction);
+		de.elbosso.ui.components.container.PalettePanel palette=new de.elbosso.ui.components.container.PalettePanel();
+		palette.add(clearTagsAction);
+		palette.add(addOntologyAction);
+		palette.add(exportOntologyAction);
+		palette.add(gotoNextUntaggedAction);
 		scroller=new JScrollPane(tagManager.getAllTagsPanel());
 		scroller.setPreferredSize(new Dimension(420,400));
 		//scroller.setWheelScrollingEnabled(false);
@@ -178,9 +177,9 @@ public class TagManager extends Object implements ImageGallery.EventCallback
 				if(index<12)
 				{
 					if(i<10)
-						icon=new ImageIcon(ResourceLoader.getImgResource("de/elbosso/ressources/gfx/eb/function keys/f0"+i+"_48.png"));
+						icon=ResourceLoader.getIcon("de/elbosso/ressources/gfx/eb/function keys/f0"+i+"_48.png");
 					else
-						icon=new ImageIcon(ResourceLoader.getImgResource("de/elbosso/ressources/gfx/eb/function keys/f"+i+"_48.png"));
+						icon=ResourceLoader.getIcon("de/elbosso/ressources/gfx/eb/function keys/f"+i+"_48.png");
 				}
 				return icon;
 			}
@@ -188,6 +187,7 @@ public class TagManager extends Object implements ImageGallery.EventCallback
 		renderer.setDefaultIcon(new ImageIcon(ResourceLoader.getImgResource("de/elbosso/ressources/gfx/common/Empty_48.png")));
 		tagManager.getFavsList().setCellRenderer(renderer);
 		dockingPanel.addDockable(favsScroller,"Favourites");
+		dockingPanel.addDockable(palette,"Palette");
 		tagmanagement.add(dockingPanel);
 		f.setContentPane(toplevel);
 		f.pack();
