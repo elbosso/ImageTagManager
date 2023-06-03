@@ -71,10 +71,10 @@ The third component on the left contains a command palette with some actions:
   This action opens a file selection dialog. The user can select a file containing tags as described
   further down - holding an ontology. The tags contained within are  expanded and added to the
   component for choosing tags
-* ![image](images/baseline_cloud_upload_black_36dp.png)
+* ![image](images/baseline_cloud_upload_black_36dp.png)  
   This action saves all tags currently in the component for choosing tags as ontology to a file.
   It opens a file choosing dialog where the user can choose the file to write the ontology to.
-* ![image](images/baseline_select_all_black_36dp.png)
+* ![image](images/baseline_select_all_black_36dp.png)  
   This action selects the first image in the current directory having no tags. Automatically
   set tags are ignored in the search: If an image has only tags set automatically - for
   example tags derived from the metadata of the image - then this image is selected
@@ -97,15 +97,15 @@ it that - when clicked on - execute various actions:
   This action selects the image before the currently seelcted one
 * ![image](images/baseline_navigate_next_black_36dp.png)  
   This action selects the image after the currently seelcted one
-* ![image](images/baseline_arrow_upward_black_36dp.png)
+* ![image](images/baseline_arrow_upward_black_36dp.png)  
   This action changes the current directory to its parent directory.
-* ![image](images/document_tagged_32.png)
+* ![image](images/document_tagged_32.png)  
   This action copies all tags added to the currently selected image to all images in the current directory.
 
 The viewer has a toolbar above it with some actions for example to zoom the image freely or to lock the zoom factor 
 in a way that the whole image is visible or the whole height/width of the image is visible.
 
-* ![image](images/baseline_add_a_photo_black_36dp.png)
+* ![image](images/baseline_add_a_photo_black_36dp.png)  
   This action saves a copy of the currently selected image. It opens a file save dialog to let the user select the file the image is written to
 * ![image](images/baseline_open_with_black_36dp.png)  
   This action scales the image to fit in its entirety into the viewport.
@@ -116,13 +116,13 @@ in a way that the whole image is visible or the whole height/width of the image 
 * ![image](images/zoom_32.png)  
   This action scales the image according to the manually choosen zoom factor. This can be set with 
   the three following actions.
-* ![image](images/baseline_zoom_in_black_36dp.png)
+* ![image](images/baseline_zoom_in_black_36dp.png)  
   This action increases the zoom factor.
-* ![image](images/baseline_crop_original_black_36dp.png)
+* ![image](images/baseline_crop_original_black_36dp.png)  
   This action resets the zoom factor - the image is displayed in its original size.
-* ![image](images/baseline_zoom_out_black_36dp.png)
+* ![image](images/baseline_zoom_out_black_36dp.png)  
   This action decreases the zoom factor.
-* ![image](src/main/resources/gfx/compass_36.png)
+* ![image](src/main/resources/gfx/compass_36.png)  
   This action opens a small window showing a copy of the currently selected window and a tiny rectangle
   representing the currently visible part inside the viewer. This rectangle can be moved
   using the mouse to pan the viewport and make navigation in large zoom factor configurations easier.
