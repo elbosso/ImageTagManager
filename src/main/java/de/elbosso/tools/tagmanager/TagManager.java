@@ -5,24 +5,25 @@
 
 package de.elbosso.tools.tagmanager;
 
-import bsh.DelayedEvalBshMethod;
+import de.elbosso.model.list.TimestampedItemCollectionWrapper;
+import de.elbosso.model.list.TimestampedTagDescription;
 import de.elbosso.ui.image.ImageDescription;
+import de.elbosso.util.lang.TagDescription;
+import de.elbosso.util.lang.TimestampedItem;
 import de.netsysit.ui.components.ImageGallery;
 import de.netsysit.util.ResourceLoader;
 import de.netsysit.util.pattern.command.FileProcessor;
 import org.slf4j.event.Level;
 
 import javax.swing.*;
-import javax.swing.plaf.ButtonUI;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
-import java.beans.DefaultPersistenceDelegate;
 import java.beans.PropertyChangeEvent;
 import java.beans.XMLEncoder;
 import java.io.File;
 import java.io.IOException;
-import java.net.Inet4Address;
+import java.util.Map;
 
 /**
  *
@@ -82,6 +83,12 @@ public class TagManager extends Object implements ImageGallery.EventCallback
 	private de.netsysit.util.pattern.command.ChooseFileAction addOntologyAction;
 	private de.netsysit.util.pattern.command.ChooseFileAction exportOntologyAction;
 	private javax.swing.Action gotoNextUntaggedAction;
+	private javax.swing.Action alphasortAscFavsAction;
+	private javax.swing.Action alphasortDescFavsAction;
+	private javax.swing.Action agesortAscFavsAction;
+	private javax.swing.Action agesortDescFavsAction;
+	private javax.swing.Action occsortAscFavsAction;
+	private javax.swing.Action occsortDescFavsAction;
 	private int selectedImageIndex=-1;
 	private final TagRepository tagRepository;
 	private ApplicationConfiguration applicationConfiguration=new ApplicationConfiguration();
@@ -123,10 +130,17 @@ public class TagManager extends Object implements ImageGallery.EventCallback
 		if((applicationConfiguration.getOntology()!=null)&&(applicationConfiguration.getOntology().isEmpty()==false))
 		{
 			l = new java.util.LinkedList();
-			for (de.elbosso.util.lang.TagDescription tagDescription : applicationConfiguration.getOntology())
+			for (TagDescription tagDescription : applicationConfiguration.getOntology())
 				l.add(tagDescription.getName());
 		}
-		tagManager=new de.elbosso.ui.components.TagManager(l,applicationConfiguration.getFavourites());
+		java.util.Map<java.lang.String, TimestampedItem<TagDescription>> occurenceCounters=new java.util.HashMap();
+		for (Map.Entry<java.lang.String,TimestampedTagDescription> timestampedTagDescription:applicationConfiguration.getFavourites().entrySet())
+		{
+			TimestampedTagDescription td=timestampedTagDescription.getValue();
+			occurenceCounters.put(timestampedTagDescription.getKey(),new TimestampedItem(td.getFirstseen(),td.getTimestamp(),td.getItem(),td.getTouchedCounter()));
+		}
+		tagManager=new de.elbosso.ui.components.TagManager(l,occurenceCounters);
+		tagManager.setComparator(new de.elbosso.util.lang.collections.InvertableComparator(tagManager.getOccurrenceCounterComparator(),false));
 		tagManager.addListener(this);
 		tagmanagement=new JPanel(new BorderLayout());
 		JPanel toplevel=new JPanel(new BorderLayout());
@@ -186,7 +200,32 @@ public class TagManager extends Object implements ImageGallery.EventCallback
 		};
 		renderer.setDefaultIcon(new ImageIcon(ResourceLoader.getImgResource("de/elbosso/ressources/gfx/common/Empty_48.png")));
 		tagManager.getFavsList().setCellRenderer(renderer);
-		dockingPanel.addDockable(favsScroller,"Favourites");
+		javax.swing.JPanel favspanel=new javax.swing.JPanel(new java.awt.BorderLayout());
+		favspanel.add(favsScroller);
+		javax.swing.JToolBar favstb=new javax.swing.JToolBar();
+		favstb.setFloatable(false);
+		javax.swing.ButtonGroup favsgroup=new javax.swing.ButtonGroup();
+		javax.swing.JToggleButton btn=new javax.swing.JToggleButton(occsortAscFavsAction);
+		favsgroup.add(btn);
+		favstb.add(btn);
+		btn.setSelected(true);
+		btn=new javax.swing.JToggleButton(occsortDescFavsAction);
+		favsgroup.add(btn);
+		favstb.add(btn);
+		btn=new javax.swing.JToggleButton(agesortAscFavsAction);
+		favsgroup.add(btn);
+		favstb.add(btn);
+		btn=new javax.swing.JToggleButton(agesortDescFavsAction);
+		favsgroup.add(btn);
+		favstb.add(btn);
+		btn=new javax.swing.JToggleButton(alphasortAscFavsAction);
+		favsgroup.add(btn);
+		favstb.add(btn);
+		btn=new javax.swing.JToggleButton(alphasortDescFavsAction);
+		favsgroup.add(btn);
+		favstb.add(btn);
+		favspanel.add(favstb, BorderLayout.NORTH);
+		dockingPanel.addDockable(favspanel,"Favourites");
 		dockingPanel.addDockable(palette,"Palette");
 		tagmanagement.add(dockingPanel);
 		f.setContentPane(toplevel);
@@ -371,6 +410,60 @@ public class TagManager extends Object implements ImageGallery.EventCallback
 					tagManager.getTagTexField().requestFocusInWindow();
 				}
 
+			}
+		};
+		alphasortAscFavsAction=new javax.swing.AbstractAction(null,de.netsysit.util.ResourceLoader.getIcon("eb/svg/design/bitmap/sort_alpha_up_48.png"))
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				de.elbosso.util.lang.collections.InvertableComparator<java.lang.String> acomp=new de.elbosso.util.lang.collections.InvertableComparator(new de.elbosso.util.lang.collections.NaturalOrderComparator(),false);
+				tagManager.setComparator(acomp);
+			}
+		};
+		alphasortDescFavsAction=new javax.swing.AbstractAction(null,de.netsysit.util.ResourceLoader.getIcon("eb/svg/design/bitmap/sort_alpha_down_48.png"))
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				de.elbosso.util.lang.collections.InvertableComparator<java.lang.String> acomp=new de.elbosso.util.lang.collections.InvertableComparator(new de.elbosso.util.lang.collections.NaturalOrderComparator(),true);
+				tagManager.setComparator(acomp);
+			}
+		};
+		agesortAscFavsAction=new javax.swing.AbstractAction(null,de.netsysit.util.ResourceLoader.getIcon("eb/svg/design/bitmap/sort_time_up_48.png"))
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				de.elbosso.util.lang.collections.InvertableComparator<java.lang.String> acomp=new de.elbosso.util.lang.collections.InvertableComparator(tagManager.getMostRecentModificationComparator(),false);
+				tagManager.setComparator(acomp);
+			}
+		};
+		agesortDescFavsAction=new javax.swing.AbstractAction(null,de.netsysit.util.ResourceLoader.getIcon("eb/svg/design/bitmap/sort_time_down_48.png"))
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				de.elbosso.util.lang.collections.InvertableComparator<java.lang.String> acomp=new de.elbosso.util.lang.collections.InvertableComparator(tagManager.getMostRecentModificationComparator(),true);
+				tagManager.setComparator(acomp);
+			}
+		};
+		occsortAscFavsAction=new javax.swing.AbstractAction(null,de.netsysit.util.ResourceLoader.getIcon("eb/svg/design/bitmap/sort_frequency_up_48.png"))
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				de.elbosso.util.lang.collections.InvertableComparator<java.lang.String> acomp=new de.elbosso.util.lang.collections.InvertableComparator(tagManager.getOccurrenceCounterComparator(),false);
+				tagManager.setComparator(acomp);
+			}
+		};
+		occsortDescFavsAction=new javax.swing.AbstractAction(null,de.netsysit.util.ResourceLoader.getIcon("eb/svg/design/bitmap/sort_frequency_down_48.png"))
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				de.elbosso.util.lang.collections.InvertableComparator<java.lang.String> acomp=new de.elbosso.util.lang.collections.InvertableComparator(tagManager.getOccurrenceCounterComparator(),true);
+				tagManager.setComparator(acomp);
 			}
 		};
 	}
@@ -760,7 +853,14 @@ public class TagManager extends Object implements ImageGallery.EventCallback
 		applicationConfiguration.setCurrentDir(tagRepository.getDirectory());
 		CLASS_LOGGER.error(tagRepository.getDirectory()+" "+applicationConfiguration.getCurrentDir());
 		applicationConfiguration.setOntology(new java.util.ArrayList(de.elbosso.model.Utilities.asList(de.elbosso.util.lang.TagDescription.class, tagManager.getListModel())));
-		applicationConfiguration.setFavourites(tagManager.getTagFavs());
+		java.util.Map<java.lang.String, TimestampedTagDescription> occurenceCounters=new java.util.HashMap();
+		for (Map.Entry<java.lang.String,TimestampedItem<TagDescription> > tagDescription:tagManager.getTagFavs().entrySet())
+		{
+			TimestampedItem<TagDescription> ti=tagDescription.getValue();
+			occurenceCounters.put(tagDescription.getKey(),new TimestampedTagDescription(ti.getFirstseen(),ti.getTimestamp(),ti.getItem(),ti.getTouchedCounter()));
+		}
+
+		applicationConfiguration.setFavourites(occurenceCounters);
 		try
 		{
 			java.io.FileOutputStream fos = new java.io.FileOutputStream(applicationConfigFile);

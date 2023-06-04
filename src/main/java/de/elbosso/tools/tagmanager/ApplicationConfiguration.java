@@ -1,5 +1,6 @@
 package de.elbosso.tools.tagmanager;
 
+import de.elbosso.model.list.TimestampedTagDescription;
 import de.elbosso.util.lang.TagDescription;
 import org.slf4j.Logger;
 
@@ -12,8 +13,8 @@ public class ApplicationConfiguration extends de.elbosso.util.beans.EventHandlin
 {
  	private final static org.slf4j.Logger CLASS_LOGGER = org.slf4j.LoggerFactory.getLogger(ApplicationConfiguration.class);
     private java.io.File currentDir=new File(System.getProperty("de.elbosso.scratch.ui.ImageGallery.folder"),"/home/elbosso");
-    private java.util.List<de.elbosso.util.lang.TagDescription> ontology;
-    private java.util.Map<java.lang.String, AtomicLong> favourites;
+    private java.util.List<TagDescription> ontology;
+    private java.util.Map<java.lang.String, TimestampedTagDescription> favourites;
 
     public ApplicationConfiguration()
     {
@@ -53,14 +54,14 @@ public class ApplicationConfiguration extends de.elbosso.util.beans.EventHandlin
         send("ontology", old, getOntology());
     }
 
-    public Map<String, AtomicLong> getFavourites()
+    public Map<String, TimestampedTagDescription> getFavourites()
     {
         return favourites;
     }
 
-    public void setFavourites(Map<String, AtomicLong> favourites)
+    public void setFavourites(Map<String, TimestampedTagDescription> favourites)
     {
-        Map<String, AtomicLong> old = getFavourites();
+        Map<String, TimestampedTagDescription> old = getFavourites();
         this.favourites = favourites;
         send("favourites", old, getFavourites());
     }
