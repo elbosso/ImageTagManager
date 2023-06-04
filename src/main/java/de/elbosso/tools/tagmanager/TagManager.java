@@ -421,7 +421,7 @@ public class TagManager extends Object implements ImageGallery.EventCallback
 				tagManager.setComparator(acomp);
 			}
 		};
-		alphasortDescFavsAction=new javax.swing.AbstractAction(null,de.netsysit.util.ResourceLoader.getIcon("eb/svg/design/bitmap/sort_alpha_down_48.png"))
+		alphasortDescFavsAction=new javax.swing.AbstractAction(null,de.netsysit.util.ResourceLoader.getIcon("eb/svg/design/bitmap/sort_alpha_down2_48.png"))
 		{
 			@Override
 			public void actionPerformed(ActionEvent e)
@@ -439,7 +439,7 @@ public class TagManager extends Object implements ImageGallery.EventCallback
 				tagManager.setComparator(acomp);
 			}
 		};
-		agesortDescFavsAction=new javax.swing.AbstractAction(null,de.netsysit.util.ResourceLoader.getIcon("eb/svg/design/bitmap/sort_time_down_48.png"))
+		agesortDescFavsAction=new javax.swing.AbstractAction(null,de.netsysit.util.ResourceLoader.getIcon("eb/svg/design/bitmap/sort_time_down2_48.png"))
 		{
 			@Override
 			public void actionPerformed(ActionEvent e)
@@ -448,7 +448,7 @@ public class TagManager extends Object implements ImageGallery.EventCallback
 				tagManager.setComparator(acomp);
 			}
 		};
-		occsortAscFavsAction=new javax.swing.AbstractAction(null,de.netsysit.util.ResourceLoader.getIcon("eb/svg/design/bitmap/sort_frequency_up_48.png"))
+		occsortAscFavsAction=new javax.swing.AbstractAction(null,de.netsysit.util.ResourceLoader.getIcon("eb/svg/design/bitmap/sort_frequency_down2_48.png"))
 		{
 			@Override
 			public void actionPerformed(ActionEvent e)
@@ -457,7 +457,7 @@ public class TagManager extends Object implements ImageGallery.EventCallback
 				tagManager.setComparator(acomp);
 			}
 		};
-		occsortDescFavsAction=new javax.swing.AbstractAction(null,de.netsysit.util.ResourceLoader.getIcon("eb/svg/design/bitmap/sort_frequency_down_48.png"))
+		occsortDescFavsAction=new javax.swing.AbstractAction(null,de.netsysit.util.ResourceLoader.getIcon("eb/svg/design/bitmap/sort_frequency_up_48.png"))
 		{
 			@Override
 			public void actionPerformed(ActionEvent e)

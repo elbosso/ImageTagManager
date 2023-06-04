@@ -60,6 +60,21 @@ The second component on the left is the List of favourites: Each time a tag is a
 to an image, this action is countes for that tag. In the favourites list, the tags are sorted according to that
 number - the ones used more often can be found on the top of the list. The first 12 of them can be added
 to the image currently worked on by simply pressing the corresponding function key.
+This component offers a toolbar to sort the favourites by several criteria:
+
+* ![image](images/sort_frequency_down2_32.png)  
+  This action sorts by usage frequency - the most used will be at the bottom of the list.
+* ![image](images/sort_frequency_up_32.png)  
+  This action sorts by usage frequency - the most used will be at the top of the list.
+* ![image](images/sort_time_up_32.png)  
+  This action sorts by time of usage - the most recently used will be at the top of the list.
+* ![image](images/sort_time_down2_32.png)  
+  This action sorts by time of usage - the most recently used will be at the bottom of the list.
+* ![image](images/sort_alpha_up_32.png)  
+  This action sorts by name.
+* ![image](images/sort_alpha_down2_32.png)  
+  This action sorts by name (descending).
+
 
 The third component on the left contains a command palette with some actions:
 
